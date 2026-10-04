@@ -1,11 +1,10 @@
 # autograd-engine
 
 A backpropagation engine, built from scratch — no `torch.autograd`.
-Part of a larger from-scratch AI stack:
-[bpe-tokenizer](https://github.com/RudraDudhat2509/bpe-tokenizer),
-[tiny-transformer](https://github.com/RudraDudhat2509/tiny-transformer),
-[vector-db](https://github.com/RudraDudhat2509/vector-db),
-[llm-agent](https://github.com/RudraDudhat2509/llm-agent).
+Part of a larger from-scratch AI stack — see the
+[root README](../README.md) for the full roadmap:
+[bpe-tokenizer](../bpe-tokenizer), [tiny-transformer](../tiny-transformer),
+`vector-db`, `llm-agent`.
 
 ## What it does
 

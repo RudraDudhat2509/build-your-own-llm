@@ -3,11 +3,10 @@
 A GPT-style transformer language model, built from scratch — architecture,
 attention, training loop, and serving, all hand-written. Toy/nanoGPT
 scale: a few million parameters, trains in minutes-to-hours on CPU or a
-single consumer GPU. Part of a larger from-scratch AI stack:
-[bpe-tokenizer](https://github.com/RudraDudhat2509/bpe-tokenizer),
-[autograd-engine](https://github.com/RudraDudhat2509/autograd-engine),
-[vector-db](https://github.com/RudraDudhat2509/vector-db),
-[llm-agent](https://github.com/RudraDudhat2509/llm-agent).
+single consumer GPU. Part of a larger from-scratch AI stack — see the
+[root README](../README.md) for the full roadmap:
+[bpe-tokenizer](../bpe-tokenizer), [autograd-engine](../autograd-engine),
+`vector-db`, `llm-agent`.
 
 ## What it covers
 

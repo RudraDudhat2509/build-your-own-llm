@@ -2,11 +2,9 @@
 
 A byte-pair encoding (BPE) tokenizer, built from scratch (MANUALLY CODED LOL) no `tiktoken`,
 no `sentencepiece`, no `transformers`. Part of a larger from-scratch AI
-stack: [autograd-engine](https://github.com/RudraDudhat2509/autograd-engine),
-[tiny-transformer](https://github.com/RudraDudhat2509/tiny-transformer),
-[vector-db](https://github.com/RudraDudhat2509/vector-db), and
-[llm-agent](https://github.com/RudraDudhat2509/llm-agent) tie the rest
-together.
+stack — see the [root README](../README.md) for the full roadmap:
+[autograd-engine](../autograd-engine), [tiny-transformer](../tiny-transformer),
+`vector-db`, and `llm-agent` tie the rest together.
 
 ## What it does
 
