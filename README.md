@@ -15,17 +15,17 @@ here on 2026-10-04 with full commit history preserved via
 
 ## Components
 
-- [x] `bpe-tokenizer` — byte-pair encoding (BPE), from scratch. Done,
+- [x] `bpe-tokenizer` -> byte-pair encoding (BPE), from scratch. Done,
   9/9 tests passing.
-- [x] `autograd-engine` — backprop engine (`Value` class: `+`, `*`,
+- [x] `autograd-engine` -> backprop engine (`Value` class: `+`, `*`,
   `tanh`, `exp`, `log`, `pow`/division). Done, 11/11 tests passing.
-- [ ] `tiny-transformer` — basic char-level MLP (scaffolded, not yet
+- [ ] `tiny-transformer` -> basic char-level MLP (scaffolded, not yet
   implemented) → attention → full transformer → training loop →
   training data → serving. Depends on `autograd-engine` via a
   relative import (sibling folder within this repo) - no packaging
   yet.
-- [ ] `vector-db` — brute-force → graph search → HNSW. Not started.
-- [ ] `llm-agent` — ties everything together + owns cloud/CI-CD/
+- [ ] `vector-db` -> brute-force → graph search → HNSW. Not started.
+- [ ] `llm-agent` -> ties everything together + owns cloud/CI-CD/
   observability. Not started.
 
 ## Running tests
