@@ -5,16 +5,13 @@ autograd engine, neural network, transformer, training loop, training
 data, serving engine, vector database, and finally the agent that ties
 it all together — deployed to the cloud, not just running on a laptop.
 
-Full roadmap and reasoning: see the design spec in the main `altagic`
-workspace at
-`docs/superpowers/specs/2026-09-12-build-your-own-llm-stack-design.md`.
+you might ask why, even idk, ig im a masochist
 
 Each component lives in its own subfolder, independently runnable
 (each has its own tests). Originally built as separate repos
 (`bpe-tokenizer`, `autograd-engine`, `tiny-transformer`) and merged
 here on 2026-10-04 with full commit history preserved via
-`git subtree` — the old repos still exist on GitHub, frozen, but this
-is the active one.
+`git subtree` 
 
 ## Components
 
