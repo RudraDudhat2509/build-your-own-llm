@@ -1,0 +1,15 @@
+=== bpe-tokenizer
+test_tokenizer.py      32      0   100%
+tokenizer.py           46      0   100%
+TOTAL                  78      0   100%
+9 passed in 1.00s
+=== autograd-engine
+test_value.py      53      0   100%
+value.py           55      3    95%
+TOTAL             108      3    97%
+11 passed in 0.57s
+=== tiny-transformer
+charmlp.py           18      4    78%
+test_charmlp.py      42     28    33%
+TOTAL                60     32    47%
+5 failed in 0.59s

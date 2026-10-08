@@ -1,0 +1,11 @@
+[grad check] 200 valid random DAGs (sampled 226, rejected 26 out-of-domain/overflow); ops used {'+': 243, '*': 237, 'tanh': 271, 'exp': 236, 'log': 224, 'pow': 250}
+  max |abs diff| over value+grads: 7.105e-15   within 1e-6: 100.0%   within 1e-9: 100.0%
+  max relative grad error 9.259e-16
+
+[learning] full-batch GD, 2-8-1 tanh MLP, MSE, identical init, float64; 3 init seeds
+  XOR                          seed 0: mine loss 1.3898->0.0023 acc 100.0% | torch loss 1.3898->0.0023 acc 100.0% | max per-step loss diff 1.32e-13 | step time mine 1.0 ms, torch 1.021 ms, ratio 1x
+  XOR                          seed 1: mine loss 1.4925->1.0007 acc 75.0% | torch loss 1.4925->1.0007 acc 75.0% | max per-step loss diff 2.22e-16 | step time mine 1.0 ms, torch 0.952 ms, ratio 1x
+  XOR                          seed 2: mine loss 1.4681->0.0027 acc 100.0% | torch loss 1.4681->0.0027 acc 100.0% | max per-step loss diff 7.77e-16 | step time mine 1.3 ms, torch 0.785 ms, ratio 2x
+  make_moons(n=100,noise=0.1)  seed 0: mine loss 1.3914->0.1598 acc 94.0% | torch loss 1.3914->0.1598 acc 94.0% | max per-step loss diff 6.66e-16 | step time mine 36.1 ms, torch 0.886 ms, ratio 41x
+  make_moons(n=100,noise=0.1)  seed 1: mine loss 2.1165->0.1434 acc 95.0% | torch loss 2.1165->0.1434 acc 95.0% | max per-step loss diff 1.11e-15 | step time mine 30.4 ms, torch 0.464 ms, ratio 66x
+  make_moons(n=100,noise=0.1)  seed 2: mine loss 0.7987->0.3323 acc 87.0% | torch loss 0.7987->0.3323 acc 87.0% | max per-step loss diff 3.89e-16 | step time mine 27.0 ms, torch 1.097 ms, ratio 25x

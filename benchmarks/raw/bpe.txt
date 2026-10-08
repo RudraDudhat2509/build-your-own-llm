@@ -1,0 +1,143 @@
+train 100000 B, held-out 100000 B (disjoint: True)
+round-trip exact match: 1000/1000
+train to vocab 1000: 29.9s  (24.9 merges/s)
+train to vocab 5000: 106.9s  (44.4 merges/s)
+vocab  tokens  bytes/token  (held-out 100 KB)
+  256  100000  1.000   (encode took 0.0s)
+  512   54374  1.839   (encode took 2.4s)
+ 1000   44905  2.227   (encode took 6.9s)
+ 2000   38814  2.576   (encode took 33.1s)
+ 5000   34221  2.922   (encode took 62.6s)
+'[Errno 11001] getaddrinfo failed' thrown while requesting HEAD https://huggingface.co/gpt2/resolve/main/tokenizer_config.json
+Retrying in 1s [Retry 1/5].
+Traceback (most recent call last):
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\socket.py", line 976, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\urllib3\connectionpool.py", line 488, in _make_request
+    raise new_e
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\urllib3\connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\urllib3\connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\urllib3\connection.py", line 759, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='openaipublic.blob.core.windows.net', port=443): Failed to resolve 'openaipublic.blob.core.windows.net' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\requests\adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\urllib3\util\retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='openaipublic.blob.core.windows.net', port=443): Max retries exceeded with url: /gpt-2/encodings/main/vocab.bpe (Caused by NameResolutionError("HTTPSConnection(host='openaipublic.blob.core.windows.net', port=443): Failed to resolve 'openaipublic.blob.core.windows.net' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\rocki\OneDrive\Desktop\altagic\build-your-own-llm\benchmarks\bench_bpe.py", line 39, in <module>
+    g = tiktoken.get_encoding("gpt2"); n = len(g.encode(held)); name = "tiktoken gpt2 (50257)"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\tiktoken\registry.py", line 86, in get_encoding
+    enc = Encoding(**constructor())
+                     ^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\tiktoken_ext\openai_public.py", line 18, in gpt2
+    mergeable_ranks = data_gym_to_mergeable_bpe_ranks(
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\tiktoken\load.py", line 110, in data_gym_to_mergeable_bpe_ranks
+    vocab_bpe_contents = read_file_cached(vocab_bpe_file, vocab_bpe_hash).decode()
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\tiktoken\load.py", line 67, in read_file_cached
+    contents = read_file(blobpath)
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\tiktoken\load.py", line 17, in read_file
+    resp = requests.get(blobpath)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\requests\api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\requests\adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='openaipublic.blob.core.windows.net', port=443): Max retries exceeded with url: /gpt-2/encodings/main/vocab.bpe (Caused by NameResolutionError("HTTPSConnection(host='openaipublic.blob.core.windows.net', port=443): Failed to resolve 'openaipublic.blob.core.windows.net' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\rocki\OneDrive\Desktop\altagic\build-your-own-llm\benchmarks\bench_bpe.py", line 42, in <module>
+    g = GPT2TokenizerFast.from_pretrained("gpt2"); n = len(g.encode(held)); name = "hf gpt2 (50257)"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\transformers\tokenization_utils_base.py", line 1620, in from_pretrained
+    resolved_config_file = cached_file(
+                           ^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\transformers\utils\hub.py", line 277, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\transformers\utils\hub.py", line 508, in cached_files
+    raise e
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\transformers\utils\hub.py", line 420, in cached_files
+    hf_hub_download(
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\huggingface_hub\utils\_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\huggingface_hub\file_download.py", line 986, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\huggingface_hub\file_download.py", line 1119, in _hf_hub_download_to_cache_dir
+    _get_metadata_or_catch_error(
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\huggingface_hub\file_download.py", line 1653, in _get_metadata_or_catch_error
+    metadata = get_hf_file_metadata(
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\huggingface_hub\utils\_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\huggingface_hub\file_download.py", line 1576, in get_hf_file_metadata
+    response = _httpx_follow_relative_redirects_with_backoff(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\huggingface_hub\utils\_http.py", line 685, in _httpx_follow_relative_redirects_with_backoff
+    response = http_backoff(
+               ^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\huggingface_hub\utils\_http.py", line 559, in http_backoff
+    return next(
+           ^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\huggingface_hub\utils\_http.py", line 467, in _http_backoff_base
+    response = client.request(method=method, url=url, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\httpx\_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rocki\anaconda3\Lib\site-packages\httpx\_client.py", line 901, in send
+    raise RuntimeError("Cannot send a request, as the client has been closed.")
+RuntimeError: Cannot send a request, as the client has been closed.
+BASELINE tiktoken gpt2 (50257 vocab): 32324 tokens, 3.094 bytes/token on the same held-out 100 KB

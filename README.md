@@ -28,6 +28,10 @@ here on 2026-10-04 with full commit history preserved via
 - [ ] `llm-agent` -> ties everything together + owns cloud/CI-CD/
   observability. Not started.
 
+## Benchmarks
+
+Measured results for the finished components are in [BENCHMARKS.md](BENCHMARKS.md): the tokenizer round-trips 1000 of 1000 random unicode strings and reaches 2.92 bytes per token on held-out text (GPT-2: 3.09, on in-domain Shakespeare only), and the autograd engine matches PyTorch gradients to 7e-15 across 200 random expression graphs and trains an MLP identically to PyTorch step for step (25x to 66x slower on 100 points).
+
 ## Running tests
 
 Each component's tests run from within its own folder:
