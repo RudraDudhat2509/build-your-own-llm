@@ -10,7 +10,10 @@ The rest check the "Raise ValueError if ..." rules in each docstring.
 Run with: pytest test_attention.py -v
 """
 import pytest
-from attention import softmax, dot, attention_weights, apply_attention, attention
+from attention import (
+    softmax, dot, attention_weights, apply_attention, attention,
+    causal_mask, attention_scores, apply_mask, masked_attention,
+)
 
 
 K1 = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
@@ -318,4 +321,194 @@ def test_attention_does_not_change_its_inputs():
     assert Q == [[1.0, 0.0]]
     assert K == [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
     assert V == [[10.0, 0.0], [0.0, 10.0], [5.0, 5.0]]
+
+
+# ----------------------------------------------------------- causal_mask
+
+def test_causal_mask_worked_example():
+    assert causal_mask(3) == [
+        [True, False, False],
+        [True, True, False],
+        [True, True, True],
+    ]
+
+
+def test_causal_mask_size_one():
+    assert causal_mask(1) == [[True]]
+
+
+def test_causal_mask_entries_are_real_bools():
+    for row in causal_mask(2):
+        for entry in row:
+            assert isinstance(entry, bool)
+
+
+def test_causal_mask_bool_raises_value_error():
+    with pytest.raises(ValueError):
+        causal_mask(True)
+    with pytest.raises(ValueError):
+        causal_mask(False)
+
+
+def test_causal_mask_non_int_raises_value_error():
+    with pytest.raises(ValueError):
+        causal_mask(2.0)
+    with pytest.raises(ValueError):
+        causal_mask("3")
+    with pytest.raises(ValueError):
+        causal_mask(None)
+
+
+def test_causal_mask_less_than_one_raises_value_error():
+    with pytest.raises(ValueError):
+        causal_mask(0)
+    with pytest.raises(ValueError):
+        causal_mask(-1)
+
+
+# ------------------------------------------------------------ attention_scores
+
+def test_attention_scores_worked_example():
+    scores = attention_scores([[1.0, 0.0]], K1)
+    assert scores[0] == pytest.approx([0.7071, 0.0, 0.7071], abs=1e-3)
+
+
+def test_attention_scores_rows_do_not_sum_to_one():
+    scores = attention_scores([[1.0, 0.0]], K1)
+    assert sum(scores[0]) != pytest.approx(1.0)
+
+
+def test_attention_scores_can_be_negative():
+    scores = attention_scores([[-1.0, 0.0]], K1)
+    assert scores[0][0] < 0
+
+
+def test_attention_scores_does_not_change_its_inputs():
+    Q = [[1.0, 0.0]]
+    K = [[1.0, 0.0], [0.0, 1.0]]
+    attention_scores(Q, K)
+    assert Q == [[1.0, 0.0]]
+    assert K == [[1.0, 0.0], [0.0, 1.0]]
+
+
+def test_attention_scores_none_or_empty_raises_value_error():
+    with pytest.raises(ValueError):
+        attention_scores(None, K1)
+    with pytest.raises(ValueError):
+        attention_scores([], K1)
+    with pytest.raises(ValueError):
+        attention_scores([[1.0, 0.0]], [])
+
+
+def test_attention_scores_ragged_or_disagreeing_raises_value_error():
+    with pytest.raises(ValueError):
+        attention_scores([[1.0, 0.0], [1.0]], K1)
+    with pytest.raises(ValueError):
+        attention_scores([[1.0, 0.0, 0.0]], K1)
+
+
+# ------------------------------------------------------------------- apply_mask
+
+def test_apply_mask_worked_example():
+    out = apply_mask([[1.0, 2.0], [3.0, 4.0]], [[True, False], [True, True]])
+    assert out == [[1.0, float("-inf")], [3.0, 4.0]]
+
+
+def test_apply_mask_blocked_is_negative_infinity_not_positive():
+    out = apply_mask([[1.0]], [[False]])
+    assert out[0][0] == float("-inf")
+
+
+def test_apply_mask_row_fully_blocked_is_allowed():
+    out = apply_mask([[1.0, 2.0]], [[False, False]])
+    assert out == [[float("-inf"), float("-inf")]]
+
+
+def test_apply_mask_does_not_change_its_inputs():
+    scores = [[1.0, 2.0]]
+    mask = [[True, False]]
+    apply_mask(scores, mask)
+    assert scores == [[1.0, 2.0]]
+    assert mask == [[True, False]]
+
+
+def test_apply_mask_none_or_empty_raises_value_error():
+    with pytest.raises(ValueError):
+        apply_mask(None, [[True]])
+    with pytest.raises(ValueError):
+        apply_mask([[1.0]], None)
+    with pytest.raises(ValueError):
+        apply_mask([], [])
+
+
+def test_apply_mask_shape_mismatch_raises_value_error():
+    with pytest.raises(ValueError):
+        apply_mask([[1.0, 2.0]], [[True]])
+    with pytest.raises(ValueError):
+        apply_mask([[1.0], [2.0]], [[True]])
+
+
+# -------------------------------------------------------------- masked_attention
+
+def test_masked_attention_worked_example():
+    Q = K = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+    V = [[10.0, 0.0], [0.0, 10.0], [5.0, 5.0]]
+    mask = causal_mask(3)
+    output, weights = masked_attention(Q, K, V, mask)
+
+    assert weights[0] == pytest.approx([1.0, 0.0, 0.0], abs=1e-3)
+    assert weights[1] == pytest.approx([0.330, 0.670, 0.0], abs=1e-3)
+    assert weights[2] == pytest.approx([0.248, 0.248, 0.503], abs=1e-3)
+
+    assert output[0] == pytest.approx([10.0, 0.0], abs=1e-2)
+    assert output[1] == pytest.approx([3.302, 6.698], abs=1e-2)
+    assert output[2] == pytest.approx([5.0, 5.0], abs=1e-2)
+
+
+def test_masked_attention_rows_still_sum_to_one():
+    Q = K = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+    V = [[10.0, 0.0], [0.0, 10.0], [5.0, 5.0]]
+    _, weights = masked_attention(Q, K, V, causal_mask(3))
+    for row in weights:
+        assert sum(row) == pytest.approx(1.0)
+
+
+def test_masked_attention_blocked_positions_are_exactly_zero():
+    Q = K = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+    V = [[10.0, 0.0], [0.0, 10.0], [5.0, 5.0]]
+    _, weights = masked_attention(Q, K, V, causal_mask(3))
+    assert weights[0][1] == 0.0
+    assert weights[0][2] == 0.0
+    assert weights[1][2] == 0.0
+
+
+def test_masked_attention_query_blocked_from_every_key_raises_value_error():
+    Q = K = [[1.0, 0.0], [0.0, 1.0]]
+    V = [[10.0, 0.0], [0.0, 10.0]]
+    with pytest.raises(ValueError):
+        masked_attention(Q, K, V, [[False, False], [True, True]])
+
+
+def test_masked_attention_v_k_length_mismatch_raises_value_error():
+    Q = K = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+    V = [[10.0, 0.0], [0.0, 10.0]]  # only 2 values, 3 keys
+    with pytest.raises(ValueError):
+        masked_attention(Q, K, V, causal_mask(3))
+
+
+def test_masked_attention_wrong_mask_shape_raises_value_error():
+    Q = K = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+    V = [[10.0, 0.0], [0.0, 10.0], [5.0, 5.0]]
+    with pytest.raises(ValueError):
+        masked_attention(Q, K, V, causal_mask(2))  # 2x2 mask for 3 queries/keys
+
+
+def test_masked_attention_does_not_change_its_inputs():
+    Q = K = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+    V = [[10.0, 0.0], [0.0, 10.0], [5.0, 5.0]]
+    mask = causal_mask(3)
+    masked_attention(Q, K, V, mask)
+    assert Q == [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+    assert V == [[10.0, 0.0], [0.0, 10.0], [5.0, 5.0]]
+    assert mask == causal_mask(3)
  
