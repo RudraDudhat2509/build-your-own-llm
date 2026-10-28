@@ -55,13 +55,29 @@ class Value:
         graph (remember self and other as this new Value's children)
         so backward() can later find its way back to them.
         """
+        if not isinstance(other,Value):
+                other=Value(other)
         return Value(self.data+other.data,children=(self,other),op='+')
+    def __neg__(self):
+        "Negates the Value, using -1, so as to support unary op -"
+        return self*Value(-1)
+    def __sub__(self,other):
+        "subtracts two different Value objects and makes sure the other is also type casted to Value"
+        if not isinstance(other,Value):
+            other=Value(other)
+        return self+(other)*-1
+    def __radd__(self,other):
+        return self+other
+    def __rmul__(self,other):
+        return self*other
 
     def __mul__(self, other):
         """
         Return a NEW Value representing self * other. Same graph-
         building requirement as __add__.
         """
+        if not isinstance(other,Value):
+                other=Value(other)
         return Value(self.data * other.data, children=(self, other), op='*')
 
     def tanh(self):

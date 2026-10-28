@@ -106,3 +106,48 @@ def test_division_via_pow():
     assert c.data == pytest.approx(2)
     assert a.grad == pytest.approx(1 / 3)
     assert b.grad == pytest.approx(-6 / 9)
+
+
+# ------------------------------------------------- arithmetic completeness
+
+def test_neg():
+    assert (-Value(2)).data == -2
+
+
+def test_sub_two_values():
+    assert (Value(5) - Value(2)).data == 3
+
+
+def test_sub_backward():
+    """z = x - y. dz/dx = 1, dz/dy = -1."""
+    x, y = Value(5.0), Value(2.0)
+    z = x - y
+    z.backward()
+    assert x.grad == pytest.approx(1)
+    assert y.grad == pytest.approx(-1)
+
+
+def test_constant_mixing_add():
+    assert (Value(2) + 3).data == 5
+    assert (3 + Value(2)).data == 5
+
+
+def test_constant_mixing_mul():
+    assert (Value(2) * 3).data == 6
+    assert (3 * Value(2)).data == 6
+
+
+def test_sub_with_plain_number():
+    assert (Value(5) - 2).data == 3
+
+
+def test_constant_mixing_does_not_break_backward():
+    """
+    Mixing a plain number in must not stop gradients flowing to the
+    REAL Value operands. y = x * 3 + 1. dy/dx = 3.
+    """
+    x = Value(4.0)
+    y = x * 3 + 1
+    y.backward()
+    assert y.data == pytest.approx(13)
+    assert x.grad == pytest.approx(3)
