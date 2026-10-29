@@ -19,18 +19,18 @@ here on 2026-10-04 with full commit history preserved via
   9/9 tests passing.
 - [x] `autograd-engine` -> backprop engine (`Value` class: `+`, `*`,
   `tanh`, `exp`, `log`, `pow`/division). Done, 11/11 tests passing.
-- [ ] `tiny-transformer` -> basic char-level MLP (scaffolded, not yet
-  implemented) → attention → full transformer → training loop →
-  training data → serving. Depends on `autograd-engine` via a
-  relative import (sibling folder within this repo) - no packaging
-  yet.
+- [ ] `tiny-transformer` -> basic char-level MLP done, attention
+  mechanism done (both tested separately) → full transformer block
+  → training loop → training data → serving, still to go. Depends
+  on `autograd-engine` via a relative import (sibling folder within
+  this repo) - no packaging yet.
 - [ ] `vector-db` -> brute-force → graph search → HNSW. Not started.
 - [ ] `llm-agent` -> ties everything together + owns cloud/CI-CD/
   observability. Not started.
 
 ## Benchmarks
 
-Measured results for the finished components are in [BENCHMARKS.md](BENCHMARKS.md): the tokenizer round-trips 1000 of 1000 random unicode strings and reaches 2.92 bytes per token on held-out text (GPT-2: 3.09, on in-domain Shakespeare only), and the autograd engine matches PyTorch gradients to 7e-15 across 200 random expression graphs and trains an MLP identically to PyTorch step for step (25x to 66x slower on 100 points).
+Measured results for the finished components are in [BENCHMARKS.md](BENCHMARKS.md): the tokenizer round-trips 1000 of 1000 random unicode strings and reaches 2.92 bytes per token on held-out text (GPT-2: 3.09, on in-domain Shakespeare only), the autograd engine matches PyTorch gradients to 7e-15 across 200 random expression graphs and trains an MLP identically to PyTorch step for step (25x to 66x slower on 100 points), attention.py passes 72/72 tests, and charmlp.py trains a toy char-level MLP from loss 74.8 down to 0.02 (99.97% reduction) over 200 steps.
 
 ## Running tests
 
