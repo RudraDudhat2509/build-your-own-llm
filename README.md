@@ -21,8 +21,10 @@ here on 2026-10-04 with full commit history preserved via
   `tanh`, `exp`, `log`, `pow`/division). Done, 11/11 tests passing.
 - [ ] `tiny-transformer` -> basic char-level MLP done, attention
   mechanism done (both tested separately) → full transformer block
-  → training loop → training data → serving, still to go. Depends
-  on `autograd-engine` via a relative import (sibling folder within
+  (with RoPE) → training loop → training data → serving (real
+  sampling + KV-cache + quantization + simulated tensor/pipeline
+  parallelism, added to scope 2026-10-29), still to go. Depends on
+  `autograd-engine` via a relative import (sibling folder within
   this repo) - no packaging yet.
 - [ ] `vector-db` -> brute-force → graph search → HNSW. Not started.
 - [ ] `llm-agent` -> ties everything together + owns cloud/CI-CD/
