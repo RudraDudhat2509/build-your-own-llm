@@ -41,14 +41,7 @@ from value import Value  # noqa: E402
 
 
 def build_vocab(text: str) -> tuple[dict[str, int], dict[int, str]]:
-    """
-    Return (stoi, itos): stoi maps each distinct character in `text`
-    to a unique integer id, itos is the reverse mapping.
-
-    Rules:
-      - Raise ValueError if text is None or empty.
-      - Ordering must be deterministic (sorted() is the natural choice).
-    """
+    """Return (stoi, itos): character-to-id and id-to-character mappings for text."""
     if not text:
         raise ValueError("Text provided is none")
     stoi={}
@@ -63,24 +56,7 @@ def build_vocab(text: str) -> tuple[dict[str, int], dict[int, str]]:
 
 import math
 def softmax_cross_entropy(logits: list[Value], target_id: int) -> Value:
-    """
-    logits: list of Value objects (one per vocabulary entry, NOT yet
-    softmax-normalized).
-    target_id: the integer id of the correct next character.
-    Returns: a single Value - the loss - built from exp, the sum of
-    exps, pow(-1) for the division, and log, exactly like the worked
-    example above.
-
-    Rules:
-      - Raise ValueError if logits is None or empty.
-      - Raise ValueError if target_id is not a valid index into logits
-        (not an int, is a bool, or out of range 0 <= target_id < len(logits)).
-
-    A note on sum(): Python's built-in sum() starts its accumulator at
-    the plain int 0, and Value only defines __add__, not __radd__ - so
-    sum([v1, v2, v3]) tries `0 + v1` first and fails. Either pass an
-    explicit Value(0.0) start, or accumulate with a plain loop.
-    """
+    """Return the cross-entropy loss Value for the logits and the correct target_id."""
     if not logits:
         raise ValueError("Logits empty")
     if target_id not in range(len(logits)):
@@ -101,20 +77,7 @@ def softmax_cross_entropy(logits: list[Value], target_id: int) -> Value:
 
 class CharMLP:
     def __init__(self, vocab_size: int, embedding_dim: int, hidden_dim: int, context_size: int):
-        """
-        Build every trainable Value this model needs:
-          - an embedding table: vocab_size rows, embedding_dim Values each
-          - a hidden layer: hidden_dim rows of (embedding_dim * context_size)
-            weights each, plus hidden_dim biases
-          - an output layer: vocab_size rows of hidden_dim weights each,
-            plus vocab_size biases
-        Random-initialize weights (random.uniform(-1, 1) is fine);
-        biases can start at 0.
-
-        Rules:
-          - Raise ValueError if any of vocab_size, embedding_dim,
-            hidden_dim, context_size is not a positive int.
-        """
+        """Create the embedding table, hidden layer and output layer as trainable Values."""
         if vocab_size<0 or embedding_dim<0 or hidden_dim<0 or context_size<0:
           raise ValueError("Not positive")
         self.embedding = [[Value(random.uniform(-1, 1)) for _ in range(embedding_dim)]
@@ -127,10 +90,7 @@ class CharMLP:
 
 
     def parameters(self) -> list[Value]:
-        """
-        Return a flat list of every trainable Value in this model -
-        every embedding entry, every weight, every bias.
-        """
+        """Return a flat list of every trainable Value in the model."""
         embed_list=[x for row in self.embedding for x in row]
         W1_list=[x for row in self.W1 for x in row]
         W2_list=[x for row in self.W2 for x in row]
@@ -144,17 +104,7 @@ class CharMLP:
     
 
     def forward(self, context_ids: list[int]) -> list[Value]:
-        """
-        context_ids: a list of character ids, length == self.context_size.
-        Returns: a list of vocab_size Value objects (the logits - NOT
-        yet softmax-normalized; that happens in softmax_cross_entropy).
-
-        Rules:
-          - Raise ValueError if context_ids is None, or its length
-            does not equal self.context_size.
-          - Raise ValueError if any id in context_ids is not a valid
-            index into the embedding table (0 <= id < vocab_size).
-        """
+        """Return the logits (one Value per vocabulary entry) for a context of character ids."""
         h=[]
         x = []
         for cid in context_ids:

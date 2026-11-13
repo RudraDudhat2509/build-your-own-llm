@@ -38,23 +38,14 @@ order. All of that is your design - nothing here prescribes it.
 import math
 class Value:
     def __init__(self, data,children=(),op=''):
-        """
-        Wrap a plain number in a Value. .grad starts at 0 - this
-        Value hasn't received any gradient yet, and won't, unless
-        backward() is eventually called on something downstream of it
-        (or on this Value itself).
-        """
+        """Wrap a number as a graph node: grad starts at 0, and it remembers its children and the op that made it."""
         self.data = data
         self.grad = 0
         self.children=children
         self.op=op
 
     def __add__(self, other):
-        """
-        Return a NEW Value representing self + other. Must build the
-        graph (remember self and other as this new Value's children)
-        so backward() can later find its way back to them.
-        """
+        """Return a new Value for self + other, recording both as children."""
         if not isinstance(other,Value):
                 other=Value(other)
         return Value(self.data+other.data,children=(self,other),op='+')
@@ -72,54 +63,25 @@ class Value:
         return self*other
 
     def __mul__(self, other):
-        """
-        Return a NEW Value representing self * other. Same graph-
-        building requirement as __add__.
-        """
+        """Return a new Value for self * other, recording both as children."""
         if not isinstance(other,Value):
                 other=Value(other)
         return Value(self.data * other.data, children=(self, other), op='*')
 
     def tanh(self):
-        """
-        Return a NEW Value representing tanh(self.data). Unary op -
-        one child, not two, so backward()'s dispatch needs a case
-        that only unpacks one child instead of two.
-        Local derivative: d(tanh(x))/dx = 1 - tanh(x)^2 - cheap to
-        compute since the output Value's own .data already IS
-        tanh(x), no need to recompute it.
-        """
+        """Return a new Value for tanh(self), recording self as its child."""
         return Value(math.tanh(self.data),children=(self,),op='tanh')
 
     def exp(self):
-        """
-        Return a NEW Value representing e^(self.data). Unary op.
-        Local derivative: d(exp(x))/dx = exp(x) - the output is its
-        own derivative, so again no extra computation needed beyond
-        what's already stored in .data.
-        """
+        """Return a new Value for e ** self, recording self as its child."""
         return Value(math.exp(self.data),children=(self,),op='exp')
 
     def log(self):
-        """
-        Return a NEW Value representing the natural log of
-        self.data. Unary op.
-        Local derivative: d(log(x))/dx = 1/x = 1/self.data.
-        """
+        """Return a new Value for the natural log of self, recording self as its child."""
         return Value(math.log(self.data),children=(self,),op='log')
 
     def __pow__(self, k):
-        """
-        Return a NEW Value representing self.data ** k, where k is a
-        plain number (int or float), NOT a Value - the exponent
-        itself isn't a trainable parameter here, so it doesn't need
-        its own graph node. Still unary (one child: self).
-        Local derivative: d(x^k)/dx = k * x^(k-1).
-        You'll need to remember k somewhere on the new Value so
-        backward() can use it later when it reaches this node -
-        where exactly is your call, same as everything else so far.
-        This is what gives you division for free later: a * b**-1.
-        """
+        """Return a new Value for self ** k (k is a plain number), remembering k for backward()."""
         out=Value(self.data**k, (self,),'pow')
         out.k=k
         return out 
@@ -137,13 +99,7 @@ class Value:
         return order
 
     def backward(self):
-        """
-        Compute the gradient of every Value that fed into this one
-        (directly or indirectly), and store it in each Value's .grad.
-        Seeds self.grad = 1 first (this Value's gradient with respect
-        to itself). Must accumulate contributions (+=), never
-        overwrite, for any Value used in more than one place.
-        """
+        """Compute .grad for every Value that fed into this one, accumulating where a Value is used more than once."""
         topo = Value.build_topo_order(self)
         self.grad = 1
 

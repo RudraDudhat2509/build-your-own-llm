@@ -23,8 +23,7 @@ the sequence wins (the natural behavior of max(dict, key=dict.get)).
 
 
 class BPETokenizer:
-    """Byte-pair encoding tokenizer: learns merges from text, then
-    encodes/decodes using them."""
+    """Byte-pair encoding tokenizer that learns merges from text, then encodes and decodes with them."""
 
     def __init__(self):
         self.ids = []
@@ -34,8 +33,7 @@ class BPETokenizer:
         self.adj_freq = {}
 
     def count_freq(self, ids):
-        """Count every adjacent pair of ids in `ids`, keyed by the
-        pair's actual values (not their positions)."""
+        """Count every adjacent pair of ids in ids, keyed by the pair's values."""
         count = {}
         for i in range(len(ids) - 1):
             pair = (ids[i], ids[i + 1])
@@ -43,8 +41,7 @@ class BPETokenizer:
         return count
 
     def replace(self, ids, new_id, x, y):
-        """Return a new list with every non-overlapping occurrence of
-        the pair (x, y) replaced by new_id, scanning left to right."""
+        """Return a new list with each non-overlapping occurrence of the pair (x, y) replaced by new_id."""
         out = []
         i = 0
         while i < len(ids):
@@ -57,17 +54,7 @@ class BPETokenizer:
         return out
 
     def train(self, text: str, vocab_size: int) -> None:
-        """
-        Learn a BPE vocabulary from `text`.
-
-        vocab_size must be >= 256 (the base byte vocabulary). The
-        number of merges learned is (vocab_size - 256). After this
-        call, self holds the learned merges (self.merges) and a
-        mapping from every token id to the byte sequence it represents
-        (self.vocab).
-
-        Does not return anything - mutates self.
-        """
+        """Learn (vocab_size - 256) merges from text and store them in self.merges and self.vocab."""
         self.ids = list(text.encode('utf-8'))
         self.merges = {}
         self.counter = 256
@@ -82,25 +69,14 @@ class BPETokenizer:
             self.counter += 1
 
     def encode(self, text: str) -> list[int]:
-        """
-        Turn a string into a list of token ids, using the merges
-        learned by train(). Must work on text this tokenizer was never
-        trained on - including text containing characters that never
-        appeared in training (e.g. emoji, accented letters) - because
-        byte-level BPE never has an "unknown token" problem. Raises if
-        called before train().
-        """
+        """Turn a string into token ids using the learned merges. Works on any text; raises if train() has not run."""
         ids = list(text.encode('utf-8'))
         for x, y in self.merges:
             ids = self.replace(ids, self.merges[(x, y)], x, y)
         return ids
 
     def decode(self, ids: list[int]) -> str:
-        """
-        Turn a list of token ids back into the original string. Must
-        satisfy: self.decode(self.encode(x)) == x for any string x,
-        once trained. Raises if called before train().
-        """
+        """Turn token ids back into the original string. Raises if train() has not run."""
         result_bytes = bytes()
         for token_id in ids:
             result_bytes += self.vocab[token_id]

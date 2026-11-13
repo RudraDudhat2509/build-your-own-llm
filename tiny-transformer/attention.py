@@ -90,22 +90,7 @@ import math
 
 
 def softmax(x: list[float]) -> list[float]:
-    """
-    Return the softmax of `x` as a NEW list (same length as x).
-
-        softmax(x)_i = exp(x_i) / sum_j exp(x_j)
-
-    Rules:
-      - Raise ValueError if x is None or empty.
-      - Raise ValueError if x contains nan or +inf.
-      - -inf is allowed and gets probability exactly 0.0
-        (softmax([0.0, -inf]) == [1.0, 0.0]).
-      - Raise ValueError if EVERY value is -inf (there is nothing left
-        to share the probability between).
-      - Must be numerically stable: softmax([1000, 1001, 1002]) must
-        not raise or give nan.
-      - Must not change `x` itself.
-    """
+    """Return the softmax of x as a new list. Stable for large values; -inf gets probability 0."""
     if not x: 
         raise ValueError("For softmax, vector must not be None")
     negative_inf_count=0
@@ -130,13 +115,7 @@ def softmax(x: list[float]) -> list[float]:
 
 
 def dot(a: list[float], b: list[float]) -> float:
-    """
-    Return the dot product of a and b: a[0]*b[0] + a[1]*b[1] + ...
-
-    Rules:
-      - Raise ValueError if a or b is None or empty.
-      - Raise ValueError if a and b have different lengths.
-    """
+    """Return the dot product of a and b."""
     if not a or not b:
         raise ValueError("A or B is None")
     if len(a)!=len(b):
@@ -144,21 +123,7 @@ def dot(a: list[float], b: list[float]) -> float:
     return sum(xi*yi for xi,yi in zip(a,b))
 
 def attention_weights(Q: list[list[float]], K: list[list[float]]) -> list[list[float]]:
-    """
-    Q: n_queries vectors, each a list of d floats.
-    K: n_keys vectors, each a list of d floats.
-    Return n_queries rows, each a list of n_keys floats that sum to 1.
-
-    For every query: score each key with dot(query, key) / sqrt(d),
-    then softmax that row of scores. Use your own softmax() and dot().
-
-    Rules:
-      - Raise ValueError if Q or K is None or empty.
-      - Raise ValueError if any vector in Q or K is empty.
-      - Raise ValueError if the vectors do not all have the same
-        length d (a ragged Q, a ragged K, or Q and K disagreeing).
-      - Must not change Q or K.
-    """
+    """For each query, score every key with dot / sqrt(d), then softmax each row."""
     if not Q or not K:
         raise ValueError("Q or K is None")
     ans=[]
@@ -175,26 +140,7 @@ def attention_weights(Q: list[list[float]], K: list[list[float]]) -> list[list[f
 
 
 def apply_attention(weights: list[list[float]], V: list[list[float]]) -> list[list[float]]:
-    """
-    weights: n_queries rows, each a list of n_keys floats.
-    V: n_keys vectors, each a list of d_v floats.
-    Return n_queries rows, each a list of d_v floats.
-
-    Row i of the output is the blend of V's vectors using row i of
-    weights, added up position by position:
-        output[i][p] = weights[i][0]*V[0][p] + weights[i][1]*V[1][p] + ...
-
-    Rules:
-      - Raise ValueError if weights or V is None or empty.
-      - Raise ValueError if any vector in V is empty, or if the vectors
-        in V do not all have the same length d_v.
-      - Raise ValueError if any row of weights does not have exactly
-        len(V) numbers (one weight per value vector).
-      - Use the weights exactly as given. Do NOT normalize them and do
-        NOT check that they sum to 1 (weights [[2.0, 0.0, 0.0]] give
-        2 times value 0).
-      - Must not change weights or V.
-    """
+    """Blend the value vectors using each row of weights, giving one output row per query."""
     if not weights or not V:
         raise ValueError("None value")
     for i in V:
@@ -221,22 +167,7 @@ def apply_attention(weights: list[list[float]], V: list[list[float]]) -> list[li
 
 
 def attention(Q: list[list[float]], K: list[list[float]], V: list[list[float]]) -> tuple[list[list[float]], list[list[float]]]:
-    """
-    Q: n_queries vectors of d floats. K: n_keys vectors of d floats.
-    V: n_keys vectors of d_v floats.
-    Return a tuple (output, weights):
-      - output  has n_queries rows of d_v floats
-      - weights has n_queries rows of n_keys floats (rows sum to 1)
-
-    Build it from your attention_weights() and apply_attention().
-
-    Rules:
-      - Raise ValueError for every rule of attention_weights (about Q
-        and K) and every rule of apply_attention (about V).
-      - Raise ValueError if V has a different number of vectors than K
-        (there must be exactly one value per key).
-      - Must not change Q, K or V.
-    """
+    """Return (output, weights): attention_weights followed by apply_attention."""
     if not V or not K:
         raise ValueError()
     if len(V)!=len(K):
@@ -246,20 +177,7 @@ def attention(Q: list[list[float]], K: list[list[float]], V: list[list[float]]) 
 
 
 def causal_mask(n: int) -> list[list[bool]]:
-    """
-    Return an n-by-n grid of True/False: row i, column j is True when
-    word i is allowed to look at word j, which means j <= i.
-
-        causal_mask(3) == [[True,  False, False],
-                           [True,  True,  False],
-                           [True,  True,  True ]]
-
-    Rules:
-      - Raise ValueError if n is not an int. (True and False are not
-        ints for this function, and neither are 2.0 or "3" or None.)
-      - Raise ValueError if n < 1.
-      - Every entry must be a real bool.
-    """
+    """Return an n-by-n grid where position i may look at position j only when j <= i."""
     if not isinstance(n,int):
         raise ValueError("n should be int")
     if isinstance(n,int) and isinstance(n,bool):
@@ -270,21 +188,7 @@ def causal_mask(n: int) -> list[list[bool]]:
 
 
 def attention_scores(Q: list[list[float]], K: list[list[float]]) -> list[list[float]]:
-    """
-    Q: n_queries vectors of d floats. K: n_keys vectors of d floats.
-    Return n_queries rows, each a list of n_keys floats:
-        scores[i][j] = dot(Q[i], K[j]) / sqrt(d)
-
-    This is attention_weights WITHOUT the softmax. The rows do not sum
-    to 1 and can be negative.
-
-    Rules (the same as attention_weights, for Q and K):
-      - Raise ValueError if Q or K is None or empty.
-      - Raise ValueError if any vector in Q or K is empty.
-      - Raise ValueError if the vectors do not all have the same
-        length d (a ragged Q, a ragged K, or Q and K disagreeing).
-      - Must not change Q or K.
-    """
+    """Return dot(query, key) / sqrt(d) for every query-key pair, before softmax."""
     if not Q or not K:
         raise ValueError("No Q or K passed")
     d_q=len(Q[0])
@@ -318,23 +222,7 @@ def attention_scores(Q: list[list[float]], K: list[list[float]]) -> list[list[fl
 
 
 def apply_mask(scores: list[list[float]], mask: list[list[bool]]) -> list[list[float]]:
-    """
-    Return a NEW grid the same shape as `scores`. Where mask is True the
-    score is kept as it is. Where mask is False the score becomes
-    float("-inf").
-
-        apply_mask([[1.0, 2.0], [3.0, 4.0]], [[True, False], [True, True]])
-        == [[1.0, -inf], [3.0, 4.0]]
-
-    Rules:
-      - Raise ValueError if scores or mask is None or empty, or if any
-        row of either one is empty.
-      - Raise ValueError if the two grids differ in shape (a different
-        number of rows, or a row with a different length).
-      - A row where EVERY entry is blocked is allowed here (softmax will
-        be the one to reject it later).
-      - Must not change scores or mask.
-    """
+    """Return a new grid with every blocked score (mask False) replaced by -inf."""
     if not scores or not mask:
         raise ValueError("Scores and mask must not be None")
     r=len(scores)
@@ -350,29 +238,7 @@ def apply_mask(scores: list[list[float]], mask: list[list[bool]]) -> list[list[f
 
 def masked_attention(Q: list[list[float]], K: list[list[float]], V: list[list[float]],
                      mask: list[list[bool]]) -> tuple[list[list[float]], list[list[float]]]:
-    """
-    Attention where the mask decides who may look at whom.
-    Q: n_queries vectors of d floats. K: n_keys vectors of d floats.
-    V: n_keys vectors of d_v floats.
-    mask: n_queries rows of n_keys bools (True = allowed to look).
-    Return a tuple (output, weights):
-      - output  has n_queries rows of d_v floats
-      - weights has n_queries rows of n_keys floats; blocked positions
-        are exactly 0.0 and every row still sums to 1
-
-    Steps: attention_scores -> apply_mask -> softmax of each row ->
-    apply_attention with V. Build it from your own functions.
-
-    Rules:
-      - Raise ValueError for every rule of attention_scores (Q and K),
-        apply_mask (the mask), and apply_attention (V).
-      - Raise ValueError if V has a different number of vectors than K.
-      - Raise ValueError if the mask is not n_queries rows by n_keys
-        columns.
-      - Raise ValueError if some query is blocked from EVERY key (there
-        is nothing to look at).
-      - Must not change Q, K, V or mask.
-    """
+    """Return (output, weights) of attention where the mask decides who may look at whom."""
     if not Q or not K or not V:
         raise ValueError("Q K V must not be not null")
     n_keys=len(V)
