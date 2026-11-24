@@ -19,7 +19,7 @@ here on 2026-10-04 with full commit history preserved via
   9/9 tests passing.
 - [x] `autograd-engine` -> backprop engine (`Value` class: `+`, `*`,
   `tanh`, `exp`, `log`, `pow`/division). Done, 11/11 tests passing.
-- [ ] `tiny-transformer` -> basic char-level MLP done, attention
+- [x] `tiny-transformer` -> basic char-level MLP done, attention
   mechanism done (both tested separately) → full transformer block
   (with RoPE) → training loop → training data → serving (real
   sampling + KV-cache + quantization + simulated tensor/pipeline
